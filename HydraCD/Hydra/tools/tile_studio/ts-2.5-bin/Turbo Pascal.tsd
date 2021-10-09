@@ -1,0 +1,91 @@
+; --------------------------------------------------------
+; Tile Studio 2.0 - TSD example for Borland Turbo Pascal
+;                   using 256 color palettes
+; 
+; Version 1.0 - June 3, 2001
+; Mike Wiering (mike.wiering@cs.kun.nl)
+; --------------------------------------------------------
+
+#file <ProjectName>GFX.PAS
+unit <ProjectName>Gfx;
+
+  { Generated: <CurrentDate> <CurrentTime> by Tile Studio version <TSVersion> }
+
+interface
+
+#palette
+  procedure <PaletteIdentifier>;
+#end palette
+
+#tileset ""
+  const
+    <TileSetIdentifier>_TileWidth = <TileWidth>;
+    <TileSetIdentifier>_TileHeight = <TileHeight>;
+    <TileSetIdentifier>_Overlap = <Overlap>;
+    <TileSetIdentifier>_TileCount = <TileCount>;
+
+  procedure <TileSetIdentifier>_Tiles;
+
+#end tileset
+
+#tileset ""
+#map ""
+  const
+    <TileSetIdentifier>_<MapIdentifier>_MapWidth = <MapWidth>;
+    <TileSetIdentifier>_<MapIdentifier>_MapHeight = <MapHeight>;
+
+  procedure <TileSetIdentifier>_<MapIdentifier>;
+  procedure <TileSetIdentifier>_<MapIdentifier>_Bounds;
+
+#end map
+#end tileset
+
+implementation
+
+#palette
+  procedure <PaletteIdentifier>; assembler;
+  asm
+    db  0, 0, 0
+#palettedata "\n    db "  "\n    db "  ""
+ <(R shr 2):"$%02x">, <(G shr 2):"$%02x">, <(B shr 2):"$%02x">
+#end palettedata
+  end;
+
+#end palette
+
+
+#tileset
+  procedure <TileSetIdentifier>_Tiles; assembler;
+  asm
+#tile ""
+  { Tile<TileNumber>: }
+#tiledata "\n    db "  ","  "\n    db "  "\n    db "  "\n"  "0"
+<Pixel + 1>
+#end tiledata
+#end tile
+  end;
+
+#end tileset
+
+#tileset ""
+#map ""
+  procedure <TileSetIdentifier>_<MapIdentifier>; assembler;
+  asm
+#mapdata  "\n    db "  ","  "\n    db "  "\n    db "  " "
+<TileNumber:"%3d">
+#end mapdata
+  end;
+
+  procedure <TileSetIdentifier>_<MapIdentifier>_Bounds; assembler;
+  asm
+#mapdata  "\n    dw "  ","  "\n    dw "  "\n    dw "  " "
+<BoundMapValue:"$%04x">
+#end mapdata
+  end;
+
+#end map
+
+#end tileset
+end.
+
+#end file

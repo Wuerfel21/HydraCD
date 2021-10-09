@@ -1,0 +1,30 @@
+; --------------------------------------------------------
+; Example for exporting binary files from Tile Studio
+;
+; Version 1.0 - June 6, 2004
+; Mike Wiering (mike@wieringsoftware.nl)
+; --------------------------------------------------------
+
+
+#binfile <ProjectName>.bin 8
+
+"This text will be included"
+<0><0><0><0><0>
+
+#tileset
+
+<TileWidth:"32">
+<TileHeight:"32">
+<TileCount:"32">
+
+#tile
+#tiledata
+<r><g><b><a>
+#end tiledata
+
+#end tile
+#end tileset
+
+#end binfile
+
+; --------------------------------------------------------

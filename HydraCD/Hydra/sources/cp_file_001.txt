@@ -1,0 +1,42 @@
+The following is a file stored on the Hydra...
+
+----------------------------
+
+' //////////////////////////////////////////////////////////////////////
+' COPIO Driver (io engine)              
+' AUTHOR: Colin Phillips
+' LAST MODIFIED: 1.20.06
+' VERSION 0.1
+' Full Duplex - Set for 115,200 bps 8-N-1 protocol
+'
+' Mini Tutorial
+' -------------
+' 1) Instantiate the copio object. (i.e. in OBJ section add ' copio : "copio_drv_001.spin" ')
+' 2) Call the start(...) function passing a pointer to 8 LONG's (defaultly set to 0)
+' 3) Call the receive_circular(...) function passing a pointer to a buffer, and the size of the buffer. e.g. 1K Buffer.
+' 4) Call send(ptr, size) function to send packets of any size (0...N) across tx pin.
+' Returns true: 'packet has successfully been placed on the queue.'
+' Returns false: 'packet has failed to be placed on the queue.'
+' 5) Call receive_queue(ptr, size) function to take packets off the receive queue
+' Returns bytes retrieved on success.
+' Returns false: if not enough bytes on the queue.
+' Note: if 'ptr' parameter is -1 ($FFFFFFFF), returns: bytes on queue.
+' Note: if 'size' parameter is -1 ($FFFFFFFF), retrieves all bytes on queue.
+' Note: if 'ptr' parameter is 0. functions as normal except doesnt write to destination.
+'
+' The recommended strategy with the send(..) function is to simply send packets of data whenever you wish.
+' If the send function returns false, either continuously retry, or do some more processing (e.g. another frame),
+' and then retry.
+'
+' The recommended strategy with the receive_queue(..) function is to simply call the function to retrieve any size packts of data.
+'
+' The receive_queue(..) function is there to make the receiving of packets much easier.
+' a send_queue(..) function would also make the sending of packets easier, but is not so essential.
+'
+' The recommended strategy with the receive(..) function is to continuously feed it buffers of atleast known size.
+' Otherwise data will be lost.
+
+
+...
+
+I think this is enough for now.

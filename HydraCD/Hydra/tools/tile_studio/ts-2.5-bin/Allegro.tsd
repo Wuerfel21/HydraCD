@@ -1,0 +1,136 @@
+; --------------------------------------------------------
+; Tile Studio Definition for use with DJGPP Allegro
+;
+; Version 1.0 - October 10, 2000
+; Mike Wiering (mike.wiering@cs.kun.nl)
+; --------------------------------------------------------
+
+; --- bitmaps --------------------------------------------
+
+; Bitmaps are saved in a subdirectory named "gfx\" in
+; .BMP format. A batch file, GFX.BAT will be generated to
+; convert these bitmaps into data for use with Allegro.
+
+#tileset
+#tilebitmap gfx\\<TileSetIdentifier>.bmp 320
+#end tilebitmap
+#end tileset
+
+; --- GFX.BAT --------------------------------------------
+
+; This batch file converts the bitmaps into data. Make
+; sure the DAT.EXE utility (that comes with Allegro) is
+; somewhere the PATH. After generating code (Tile Studio,
+; F10), you must run GFX.BAT before compiling.
+
+#file GFX.BAT
+@echo off
+if exist <ProjectName>.dat del <ProjectName>.dat
+#tileset
+DAT -a -t BMP -c1 -bpp 16 -s1 <ProjectName>.dat gfx\\<TileSetIdentifier>.bmp
+#end tileset
+ren <ProjectName>.dat <ProjectName>.dat
+#end file
+
+; --- c file ---------------------------------------------
+
+; This file should be included in the source code.
+
+#file gfx\\<ProjectName>Gfx.c
+##ifndef _<ProjectName>Gfx_c
+##define _<ProjectName>Gfx_c
+
+
+##ifndef _GFX_BITMAP_DATA
+##define _GFX_BITMAP_DATA
+/* structure with bitmap data */
+typedef struct GFX_BITMAP_DATA
+{
+  int BitmapIdentifier;
+  int BitmapWidth;
+  int BitmapHeight;
+  int TileWidth;
+  int TileHeight;
+  int TileCountX;
+  int TileCountY;
+  int TransparentX;
+  int TransparentY;
+  int Sequences;
+  int ** SequenceData;
+  int * SequenceLength;
+  int * SequencePosition;
+  int * SequenceCounter;
+
+} GFX_BITMAP_DATA;
+##endif
+
+
+##ifndef _GFX_EMPTY
+##define _GFX_EMPTY
+static int Empty[] = {0};
+##endif
+
+#tileset
+#map
+
+##define Gfx<TileSetIdentifier><MapIdentifier>MapWidth (<MapWidth>)
+##define Gfx<TileSetIdentifier><MapIdentifier>MapHeight (<MapHeight>)
+
+signed short <TileSetIdentifier><MapIdentifier>MapData[<MapHeight>][<MapWidth>] =
+#mapdata  "\n  {{"  ","  ",\n   "  "},\n  {"  "}};"
+<TileNumber:"%2d">
+#end mapdata
+
+unsigned short <TileSetIdentifier><MapIdentifier>BoundMapData[<MapHeight>][<MapWidth>] =
+#mapdata  "\n  {{"  ","  ",\n   "  "},\n  {"  "}};"
+<BoundMapValue>
+#end mapdata
+
+#end map
+
+/* tile sequences */
+#sequence
+int <TileSetIdentifier>Seq<SequenceNumber>[] =
+#sequencedata  " {"  ", "  ", -1};"
+<TileNumber>,<FrameCount>
+#end sequencedata
+#end sequence
+
+int <TileSetIdentifier>SeqLength[] =
+{
+#sequence
+  <SequenceLength>,
+#end sequence
+  -1
+};
+
+int <TileSetIdentifier>SeqPosition[<SequenceCount> + 1];
+int <TileSetIdentifier>SeqCounter[<SequenceCount> + 1];
+
+int * <TileSetIdentifier>Sequences[] = 
+{
+#sequence
+  <TileSetIdentifier>Seq<SequenceNumber>,
+#end sequence
+  Empty
+};
+
+; \\p=:{x, y} t -> {x = <ScrollX>, y = <ScrollY>} 
+
+#end tileset 
+
+/* bitmap data */
+#tileset
+const struct GFX_BITMAP_DATA Gfx<TileSetIdentifier>Bitmap = 
+  { <TileSetCount> - <TileSetNumber> - 1,  <TileSetBitmapWidth>, <TileSetBitmapHeight>,  <TileWidth>, <TileHeight>,
+    <HorizontalTileCount>, <VerticalTileCount>,  <TransparentPosX>, <TransparentPosY>, <SequenceCount>,
+    &<TileSetIdentifier>Sequences[0], &<TileSetIdentifier>SeqLength[0],
+    &<TileSetIdentifier>SeqPosition[0], &<TileSetIdentifier>SeqCounter[0]
+  };
+
+#end tileset
+
+##endif
+#end file
+
+; --------------------------------------------------------

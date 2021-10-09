@@ -1,0 +1,174 @@
+; --------------------------------------------------------
+; Tile Studio Definition for use with Concurrent Clean
+; Use these settings to work with the Clean Game Library
+;
+; Special version with resources
+;
+; Version 1.0 - October 11, 2000
+; --------------------------------------------------------
+
+; --- bitmaps --------------------------------------------
+
+#tileset
+#tilebitmap bitmaps\\<TileSetIdentifier>.bmp 320
+#end tilebitmap
+#end tileset
+
+; --- resource file --------------------------------------
+
+#file <ProjectName>RES.rc
+#tileset
+<TileSetIdentifier>  BITMAP  \"bitmaps\\\\<TileSetIdentifier>.bmp\"
+#end tileset
+
+#end file
+
+; --- C program that includes the resources --------------
+
+#file <ProjectName>RES.c
+int main ()
+{
+  return 0;
+}
+#end file
+
+; --- batch file to compile resources --------------------
+
+#file MAKERES.BAT
+rc -r -fo <ProjectName>RES.res <ProjectName>RES.rc
+cl <ProjectName>RES.c /link <ProjectName>RES.res /machine:IX86
+#end file
+
+; --- definition module ----------------------------------
+
+#file <ProjectName>Gfx.dcl
+definition module <ProjectName>Gfx
+
+import StdEnv, StdGameDef
+
+OBJ_START :== 0x10
+
+#tileset
+<TileSetIdentifier>Bitmap :: GameBitmap
+
+#map
+<TileSetIdentifier><MapIdentifier>Map :: [{#Int}]
+<TileSetIdentifier><MapIdentifier>BoundMapData :: [{#Int}]
+<TileSetIdentifier><MapIdentifier>BoundMap :: BoundMap
+<TileSetIdentifier><MapIdentifier>WideBoundMap :: BoundMap
+#end map
+
+#sequence
+<TileSetIdentifier>Seq<SequenceNumber> :: (Int, [(Int, Int)])
+#end sequence
+
+<TileSetIdentifier>Sequences :: [(Int, [(Int, Int)])]
+
+#map
+<TileSetIdentifier><MapIdentifier>Layer :: Layer
+#end map
+
+#sequence
+<SpriteName>Sprite<SpriteNumber> :: Sprite
+<SpriteName>Animation<SpriteNumber> :: Sprite
+#end sequence
+#end tileset
+
+#end file
+
+; --- implementation module ------------------------------
+
+#file <ProjectName>Gfx.icl
+implementation module <ProjectName>Gfx
+
+import StdEnv, StdGameDef
+
+OBJ_START :== 0x10
+
+#tileset
+<TileSetIdentifier>Bitmap :: GameBitmap
+<TileSetIdentifier>Bitmap
+  = { bitmapname  = "<TileSetIdentifier>"
+    , unitsize    = { w = <TileWidth>, h = <TileHeight> }
+    , dimensions  = (<HorizontalTileCount>, <VerticalTileCount>)
+    , transparent = Just { x = <TransparentPosX>, y = <TransparentPosY> }
+    }
+
+#map
+<TileSetIdentifier><MapIdentifier>Map :: [{#Int}]
+<TileSetIdentifier><MapIdentifier>Map =
+#mapdata  "\n  [{"  ","  ",\n    "  "},\n   {"  "}]"
+<TileNumber:"%3d">
+#end mapdata
+
+<TileSetIdentifier><MapIdentifier>BoundMapData :: [{#Int}]
+<TileSetIdentifier><MapIdentifier>BoundMapData =
+#mapdata  "\n  [{"  ","  ",\n    "  "},\n   {"  "}]"
+ <BoundMapValue>
+#end mapdata
+
+<TileSetIdentifier><MapIdentifier>BoundMap :: BoundMap
+<TileSetIdentifier><MapIdentifier>BoundMap
+  = { map       = <TileSetIdentifier><MapIdentifier>BoundMapData
+    , blocksize = { w = <TileWidth>, h = <TileHeight> }
+    , objstart  = OBJ_START
+    , startobjx = 1
+    , startobjy = 1
+    }
+
+<TileSetIdentifier><MapIdentifier>WideBoundMap :: BoundMap
+<TileSetIdentifier><MapIdentifier>WideBoundMap
+  = { <TileSetIdentifier><MapIdentifier>BoundMap 
+    & startobjx = <MapWidth>
+    , startobjy = <MapHeight>
+    }
+
+#end map
+
+#sequence
+<TileSetIdentifier>Seq<SequenceNumber> :: (Int, [(Int, Int)])
+<TileSetIdentifier>Seq<SequenceNumber> =
+  (-<SequenceNumber>,
+#sequencedata  " [("  "), ("  ")])"
+<TileNumber>, <FrameCount>
+#end sequencedata
+#end sequence
+
+<TileSetIdentifier>Sequences :: [(Int, [(Int, Int)])]
+<TileSetIdentifier>Sequences = 
+  [
+#sequence ","
+    <TileSetIdentifier>Seq<SequenceNumber>
+#end sequence
+  ]
+
+#map
+<TileSetIdentifier><MapIdentifier>Layer :: Layer
+<TileSetIdentifier><MapIdentifier>Layer
+  = { bmp       = <TileSetIdentifier>Bitmap
+    , layermap  = <TileSetIdentifier><MapIdentifier>Map
+    , sequences = <TileSetIdentifier>Sequences
+    , movement  = \\p=:{x, y} t -> {x = <ScrollX>, y = <ScrollY>} 
+    }
+#end map
+
+#sequence
+<SpriteName>Sprite<SpriteNumber> :: Sprite
+<SpriteName>Sprite<SpriteNumber>
+ = { bitmap = <TileSetIdentifier>Bitmap
+   , sequence =
+#sequencedata  " [("  "), ("  ")]"
+<TileNumber>, <FrameCount>
+#end sequencedata
+   , loop = True
+   }
+<SpriteName>Animation<SpriteNumber> :: Sprite
+<SpriteName>Animation<SpriteNumber>
+   = { <SpriteName>Sprite<SpriteNumber> & loop = False }
+
+#end sequence
+#end tileset
+
+#end file
+
+; --------------------------------------------------------

@@ -1,0 +1,143 @@
+; --------------------------------------------------------
+; Tile Studio Definition for use with Concurrent Clean
+; Use these settings to work with the Clean Game Library
+;
+; Version 1.0 - March 10, 2000
+; --------------------------------------------------------
+
+; --- bitmap file ----------------------------------------
+
+#tileset
+#tilebitmap bitmaps\\<TileSetIdentifier>.bmp 320
+#end tilebitmap
+#end tileset
+
+; --- definition module ----------------------------------
+
+#file <ProjectName>Gfx.dcl
+definition module <ProjectName>Gfx
+
+import StdEnv, StdGameDef
+
+#tileset
+<TileSetIdentifier>Bitmap :: GameBitmap
+
+#map
+<TileSetIdentifier><MapIdentifier>Map :: [{#Int}]
+<TileSetIdentifier><MapIdentifier>BoundMapData :: [{#Int}]
+<TileSetIdentifier><MapIdentifier>BoundMap :: BoundMap
+<TileSetIdentifier><MapIdentifier>WideBoundMap :: BoundMap
+#end map
+
+#sequence
+<TileSetIdentifier>Seq<SequenceNumber> :: (Int, [(Int, Int)])
+#end sequence
+
+<TileSetIdentifier>Sequences :: [(Int, [(Int, Int)])]
+
+#map
+<TileSetIdentifier><MapIdentifier>Layer :: Layer
+#end map
+
+#sequence
+<SpriteName>Sprite<SpriteNumber> :: Sprite
+<SpriteName>Animation<SpriteNumber> :: Sprite
+#end sequence
+#end tileset
+
+#end file
+
+; --- implementation module ------------------------------
+
+#file <ProjectName>Gfx.icl
+implementation module <ProjectName>Gfx
+
+import StdEnv, StdGameDef
+
+#tileset
+<TileSetIdentifier>Bitmap :: GameBitmap
+<TileSetIdentifier>Bitmap
+  = { bitmapname  = "bitmaps\\\\<TileSetIdentifier>.bmp"
+    , unitsize    = { w = <TileWidth>, h = <TileHeight> }
+    , dimensions  = (<HorizontalTileCount>, <VerticalTileCount>)
+    , transparent = Just { x = <TransparentPosX>, y = <TransparentPosY> }
+    }
+
+#map
+<TileSetIdentifier><MapIdentifier>Map :: [{#Int}]
+<TileSetIdentifier><MapIdentifier>Map =
+#mapdata  "\n  [{"  ","  ",\n    "  "},\n   {"  "}]"
+<TileNumber:"%3d">
+#end mapdata
+
+<TileSetIdentifier><MapIdentifier>BoundMapData :: [{#Int}]
+<TileSetIdentifier><MapIdentifier>BoundMapData =
+#mapdata  "\n  [{"  ","  ",\n    "  "},\n   {"  "}]"
+ <BoundMapValue>
+#end mapdata
+
+<TileSetIdentifier><MapIdentifier>BoundMap :: BoundMap
+<TileSetIdentifier><MapIdentifier>BoundMap
+  = { map       = <TileSetIdentifier><MapIdentifier>BoundMapData
+    , blocksize = { w = <TileWidth>, h = <TileHeight> }
+    , objstart  = 0x10
+    , startobjx = 1
+    , startobjy = 1
+    }
+
+<TileSetIdentifier><MapIdentifier>WideBoundMap :: BoundMap
+<TileSetIdentifier><MapIdentifier>WideBoundMap
+  = { <TileSetIdentifier><MapIdentifier>BoundMap 
+    & startobjx = <MapWidth>
+    , startobjy = <MapHeight>
+    }
+
+#end map
+
+#sequence
+<TileSetIdentifier>Seq<SequenceNumber> :: (Int, [(Int, Int)])
+<TileSetIdentifier>Seq<SequenceNumber> =
+  (-<SequenceNumber>,
+#sequencedata  " [("  "), ("  ")])"
+<TileNumber>, <FrameCount>
+#end sequencedata
+#end sequence
+
+<TileSetIdentifier>Sequences :: [(Int, [(Int, Int)])]
+<TileSetIdentifier>Sequences = 
+  [
+#sequence ","
+    <TileSetIdentifier>Seq<SequenceNumber>
+#end sequence
+  ]
+
+#map
+<TileSetIdentifier><MapIdentifier>Layer :: Layer
+<TileSetIdentifier><MapIdentifier>Layer
+  = { bmp       = <TileSetIdentifier>Bitmap
+    , layermap  = <TileSetIdentifier><MapIdentifier>Map
+    , sequences = <TileSetIdentifier>Sequences
+    , movement  = \\p=:{x, y} t -> {x = <ScrollX>, y = <ScrollY>} 
+    }
+#end map
+
+#sequence
+<SpriteName>Sprite<SpriteNumber> :: Sprite
+<SpriteName>Sprite<SpriteNumber>
+ = { bitmap = <TileSetIdentifier>Bitmap
+   , sequence =
+#sequencedata  " [("  "), ("  ")]"
+<TileNumber>, <FrameCount>
+#end sequencedata
+   , loop = True
+   }
+<SpriteName>Animation<SpriteNumber> :: Sprite
+<SpriteName>Animation<SpriteNumber>
+   = { <SpriteName>Sprite<SpriteNumber> & loop = False }
+
+#end sequence
+#end tileset
+
+#end file
+
+; --------------------------------------------------------

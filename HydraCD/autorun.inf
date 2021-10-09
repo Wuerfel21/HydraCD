@@ -1,0 +1,4 @@
+[autorun]
+shellexecute = readme.htm
+icon = gppph_icon.ico
+

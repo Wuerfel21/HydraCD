@@ -1,0 +1,138 @@
+; --------------------------------------------------------
+; Tile Studio Definition for use with MS Visual C++ (with
+; DirectX)
+;
+; Version 1.0 - October 1, 2000
+; Mike Wiering (mike.wiering@cs.kun.nl)
+; --------------------------------------------------------
+
+; --- bitmap file ----------------------------------------
+
+; All unique tiles are saved together in a bitmap. Older
+; DirectX versions do not allow the bitmaps to be wider
+; than the screen width, so don't make these tile bitmaps
+; wider than 320 pixels.
+;
+; Bitmaps are saved in a subdirectory named "gfx\".
+
+#tileset
+#tilebitmap gfx\\<TileSetIdentifier>.bmp 320
+#end tilebitmap
+#end tileset
+
+; --- resource file --------------------------------------
+
+; A special resource file "gfx\...Bitmaps.rc" is created
+; (where ... is the project name), which can be included
+; into the project's resource file:
+;
+;     #include "gfx\...Bitmaps.rc"
+
+#file gfx\\<ProjectName>Bitmaps.rc
+#tileset
+<TileSetIdentifier> BITMAP \"gfx\\<TileSetIdentifier>.bmp\"
+#end tileset
+#end file
+
+; --- c file ---------------------------------------------
+
+; This file should be included in the source code.
+
+#file gfx\\<ProjectName>Gfx.c
+##ifndef _<ProjectName>Gfx_c
+##define _<ProjectName>Gfx_c
+
+
+##ifndef _GFX_BITMAP_DATA
+##define _GFX_BITMAP_DATA
+/* structure with bitmap data */
+typedef struct GFX_BITMAP_DATA
+{
+  char * BitmapIdentifier;
+  int BitmapWidth;
+  int BitmapHeight;
+  int TileWidth;
+  int TileHeight;
+  int TileCountX;
+  int TileCountY;
+  int TransparentX;
+  int TransparentY;
+  int Sequences;
+  int ** SequenceData;
+  int * SequenceLength;
+  int * SequencePosition;
+  int * SequenceCounter;
+
+} GFX_BITMAP_DATA;
+##endif
+
+
+##ifndef _GFX_EMPTY
+##define _GFX_EMPTY
+static int Empty[] = {0};
+##endif
+
+#tileset
+#map
+
+##define Gfx<TileSetIdentifier><MapIdentifier>MapWidth (<MapWidth>)
+##define Gfx<TileSetIdentifier><MapIdentifier>MapHeight (<MapHeight>)
+
+signed short <TileSetIdentifier><MapIdentifier>MapData[<MapHeight>][<MapWidth>] =
+#mapdata  "\n  {{"  ","  ",\n   "  "},\n  {"  "}};"
+<TileNumber:"%2d">
+#end mapdata
+
+unsigned short <TileSetIdentifier><MapIdentifier>BoundMapData[<MapHeight>][<MapWidth>] =
+#mapdata  "\n  {{"  ","  ",\n   "  "},\n  {"  "}};"
+<BoundMapValue>
+#end mapdata
+
+#end map
+
+/* tile sequences */
+#sequence
+int <TileSetIdentifier>Seq<SequenceNumber>[] =
+#sequencedata  " {"  ", "  ", -1};"
+<TileNumber>,<FrameCount>
+#end sequencedata
+#end sequence
+
+int <TileSetIdentifier>SeqLength[] =
+{
+#sequence
+  <SequenceLength>,
+#end sequence
+  -1
+};
+
+int <TileSetIdentifier>SeqPosition[<SequenceCount> + 1];
+int <TileSetIdentifier>SeqCounter[<SequenceCount> + 1];
+
+int * <TileSetIdentifier>Sequences[] = 
+{
+#sequence
+  <TileSetIdentifier>Seq<SequenceNumber>,
+#end sequence
+  Empty
+};
+
+; \\p=:{x, y} t -> {x = <ScrollX>, y = <ScrollY>} 
+
+#end tileset 
+
+/* bitmap data */
+#tileset
+const struct GFX_BITMAP_DATA Gfx<TileSetIdentifier>Bitmap = 
+  { \"<TileSetIdentifier>\",  <TileSetBitmapWidth>, <TileSetBitmapHeight>,  <TileWidth>, <TileHeight>,  
+    <HorizontalTileCount>, <VerticalTileCount>,  <TransparentPosX>, <TransparentPosY>, <SequenceCount>,
+    &<TileSetIdentifier>Sequences[0], &<TileSetIdentifier>SeqLength[0],
+    &<TileSetIdentifier>SeqPosition[0], &<TileSetIdentifier>SeqCounter[0]
+  };
+
+#end tileset
+
+##endif
+#end file
+
+; --------------------------------------------------------

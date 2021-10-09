@@ -1,0 +1,29 @@
+; HYDRAMAN Map
+; this is the map file. symbols are case sensitive.
+; for use with the Hydra/Micro/Pico Compatible XGSBMP.
+WIDTH 16
+HEIGHT 14
+VRAM_WIDTH 128
+VRAM_HEIGHT 128
+TILE_WIDTH 16
+TILE_HEIGHT 16
+DEFAULT (0,0)
+DEFINE ' ' (0,0)
+DEFINE ''' (1,0)
+DEFINE '#' (2,0)
+DEFINE '=' (3,0)
+START 		; next line starts
+
+###############
+#'==='====='='#
+# #=#=#=#=#=#=#
+#===== =======#
+# # # # # # # #
+# '== '=' ' ' #
+# # # #=# # # #
+# ' '===' ' ' #
+# # # # # # # #
+#             #
+# # # # # # # #
+#             #
+###############
